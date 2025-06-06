@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { dbPromise } from './db';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import type { TranslationKey } from './contexts/LanguageContext';
+import TaskCard from './components/TaskCard';
 
 type TaskStatus = Extract<TranslationKey, 'not_started' | 'in_progress' | 'completed'>;
 
@@ -146,31 +147,24 @@ const TodoApp: React.FC = () => {
     }));
   };
 
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      const db = await dbPromise;
+      await db.delete('tasks', taskId);
+      setTasks(tasks.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
+  };
+
   const renderTaskCard = (provided: DraggableProvided, snapshot: DraggableStateSnapshot, task: Task) => (
-    <div
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      className={`p-4 mb-2 rounded-lg bg-gray-100 dark:bg-gray-700 cursor-move transition-shadow ${
-        snapshot.isDragging ? 'shadow-lg opacity-50' : ''
-      }`}
-    >
-      <h3 className="font-medium">{task.title}</h3>
-      <p className="text-sm opacity-75">{task.description}</p>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {task.labels.map(label => (
-          <span
-            key={label}
-            className="px-2 py-1 text-xs rounded-full text-white"
-            style={{
-              backgroundColor: labels.find(l => l.name === label)?.color || '#E5E7EB'
-            }}
-          >
-            {label}
-          </span>
-        ))}
-      </div>
-    </div>
+    <TaskCard
+      task={task}
+      index={tasks.findIndex(t => t.id === task.id)}
+      labels={labels}
+      isDragging={snapshot.isDragging}
+      onDelete={handleDeleteTask}
+    />
   );
 
   const renderDroppableColumn = (provided: DroppableProvided, snapshot: DroppableStateSnapshot, status: TaskStatus) => (
