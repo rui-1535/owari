@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "シンプルで使いやすいタスク管理アプリケーション",
   "main": "app.js",
+  "homepage": "https://github.com/rui-1535/owari#readme",
   "scripts": {
     "start": "serve .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,8 +24,10 @@
   "bugs": {
     "url": "https://github.com/rui-1535/owari/issues"
   },
-  "homepage": "https://github.com/rui-1535/owari#readme",
   "dependencies": {
     "serve": "^14.2.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
