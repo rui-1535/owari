@@ -47,6 +47,37 @@ header {
     margin-bottom: 2rem;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.note-icon {
+    font-size: 2rem;
+    color: #4CAF50;
+    animation: rotate 2s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-10deg);
+    }
+    75% {
+        transform: rotate(10deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+[data-theme="dark"] .note-icon {
+    color: #66bb6a;
+}
+
 h1 {
     font-size: 2rem;
     color: var(--text-primary);
