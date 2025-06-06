@@ -1,56 +1,28 @@
 {
   "name": "todo-app",
-  "version": "0.1.0",
-  "private": true,
-  "homepage": "https://ルイ-1535.github.io/Todonennnotame",
-  "dependencies": {
-    "@types/node": "^16.18.126",
-    "@types/react": "^18.3.22",
-    "@types/react-beautiful-dnd": "^13.1.8",
-    "@types/react-dom": "^18.3.7",
-    "autoprefixer": "^10.4.21",
-    "framer-motion": "^10.18.0",
-    "idb": "^7.1.1",
-    "postcss": "^8.5.3",
-    "react": "^18.3.1",
-    "react-beautiful-dnd": "^13.1.1",
-    "react-dom": "^18.3.1",
-    "react-scripts": "^5.0.1",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^4.9.5"
-  },
-  "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "gh-pages": "^6.3.0"
-  },
-  "description": "シンプルで使いやすいToDoアプリケーションです。タスクの管理、ラベル付け、ドラッグ&ドロップによる並び替え、ダークモード、多言語対応（日本語/英語/中国語）などの機能を備えています。",
+  "version": "1.0.0",
+  "description": "シンプルで使いやすいタスク管理アプリケーション",
   "main": "app.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "scripts": {
+    "start": "serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rui-1535/owari.git"
+  },
+  "keywords": [
+    "todo",
+    "task-management",
+    "javascript"
+  ],
+  "author": "rui-1535",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rui-1535/owari/issues"
+  },
+  "homepage": "https://github.com/rui-1535/owari#readme",
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
 }

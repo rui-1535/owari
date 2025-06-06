@@ -79,27 +79,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, labels, isDragging, on
               <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(task.status)}`}>
                 {t(task.status)}
               </span>
-              {task.labels.map(label => (
-                <span
-                  key={label}
-                  className="px-2 py-1 text-xs rounded-full"
-                  style={{
-                    backgroundColor: labels.find(l => l.name === label)?.color || '#E5E7EB'
-                  }}
-                >
-                  {label}
-                </span>
-              ))}
             </div>
-            {snapshot.isDragging && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="absolute top-0 right-0 mt-2 mr-2 text-green-500"
-              >
-                ✓
-              </motion.div>
-            )}
           </motion.div>
         </div>
       )}

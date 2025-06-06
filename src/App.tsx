@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided, DraggableStateSnapshot, DroppableStateSnapshot } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dbPromise } from './db';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
@@ -18,46 +18,30 @@ interface Task {
   updatedAt: Date;
 }
 
-interface Label {
-  name: string;
-  color: string;
-}
-
-const DEFAULT_LABELS: Label[] = [
-  { name: '重要', color: '#EF4444' },
-  { name: '緊急', color: '#F59E0B' },
-  { name: '進行中', color: '#3B82F6' },
-  { name: '完了', color: '#10B981' },
-];
-
 const TASK_STATUSES: TaskStatus[] = ['not_started', 'in_progress', 'completed'];
 
 const TodoApp: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [labels, setLabels] = useState<Label[]>(DEFAULT_LABELS);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [isAddingTask, setIsAddingTask] = useState(false);
-  const [newTask, setNewTask] = useState<Partial<Task>>({
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [newTask, setNewTask] = useState({
     title: '',
     description: '',
-    status: 'not_started',
-    labels: [],
+    status: 'not_started' as TaskStatus,
+    labels: ['not_started'] as string[],
   });
 
+  // ステータスラベルのみを定義
+  const labels = [
+    { name: 'not_started', color: '#EF4444' },
+    { name: 'in_progress', color: '#F59E0B' },
+    { name: 'completed', color: '#10B981' },
+  ];
+
   useEffect(() => {
-    const loadData = async () => {
-      const db = await dbPromise;
-      const loadedTasks = await db.getAll('tasks');
-      const loadedLabels = await db.getAll('labels');
-      setTasks(loadedTasks.map(task => ({
-        ...task,
-        id: task.id || 0,
-      })));
-      setLabels(loadedLabels.length > 0 ? loadedLabels : DEFAULT_LABELS);
-    };
-    loadData();
+    loadTasks();
   }, []);
 
   useEffect(() => {
@@ -68,13 +52,18 @@ const TodoApp: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  useEffect(() => {
-    const allCompleted = tasks.length > 0 && tasks.every(task => task.status === 'completed');
-    if (allCompleted) {
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+  const loadTasks = async () => {
+    try {
+      const db = await dbPromise;
+      const allTasks = await db.getAll('tasks');
+      setTasks(allTasks.map(task => ({
+        ...task,
+        id: task.id || 0,
+      })));
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
     }
-  }, [tasks]);
+  };
 
   const handleAddTask = async () => {
     if (!newTask.title) return;
@@ -82,8 +71,8 @@ const TodoApp: React.FC = () => {
     const task: Omit<Task, 'id'> = {
       title: newTask.title,
       description: newTask.description || '',
-      status: newTask.status || 'not_started',
-      labels: newTask.labels || [],
+      status: 'not_started',
+      labels: ['not_started'],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -96,9 +85,19 @@ const TodoApp: React.FC = () => {
       title: '',
       description: '',
       status: 'not_started',
-      labels: [],
+      labels: ['not_started'],
     });
     setIsAddingTask(false);
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      const db = await dbPromise;
+      await db.delete('tasks', taskId);
+      setTasks(tasks.filter(task => task.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   };
 
   const handleDragEnd = async (result: DropResult) => {
@@ -120,7 +119,12 @@ const TodoApp: React.FC = () => {
 
     const updatedTasks = tasks.map(task =>
       task.id === taskId
-        ? { ...task, status: newStatus, updatedAt: new Date() }
+        ? { 
+            ...task, 
+            status: newStatus, 
+            labels: [newStatus],
+            updatedAt: new Date() 
+          }
         : task
     );
 
@@ -131,6 +135,7 @@ const TodoApp: React.FC = () => {
       await db.put('tasks', {
         ...taskToUpdate,
         status: newStatus,
+        labels: [newStatus],
         updatedAt: new Date()
       });
     } catch (error) {
@@ -138,63 +143,8 @@ const TodoApp: React.FC = () => {
     }
   };
 
-  const toggleLabel = (labelName: string) => {
-    setNewTask(prev => ({
-      ...prev,
-      labels: prev.labels?.includes(labelName)
-        ? prev.labels.filter(l => l !== labelName)
-        : [...(prev.labels || []), labelName]
-    }));
-  };
-
-  const handleDeleteTask = async (taskId: number) => {
-    try {
-      const db = await dbPromise;
-      await db.delete('tasks', taskId);
-      setTasks(tasks.filter(task => task.id !== taskId));
-    } catch (error) {
-      console.error('Failed to delete task:', error);
-    }
-  };
-
-  const renderTaskCard = (provided: DraggableProvided, snapshot: DraggableStateSnapshot, task: Task) => (
-    <TaskCard
-      task={task}
-      index={tasks.findIndex(t => t.id === task.id)}
-      labels={labels}
-      isDragging={snapshot.isDragging}
-      onDelete={handleDeleteTask}
-    />
-  );
-
-  const renderDroppableColumn = (provided: DroppableProvided, snapshot: DroppableStateSnapshot, status: TaskStatus) => (
-    <div
-      ref={provided.innerRef}
-      {...provided.droppableProps}
-      className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg"
-    >
-      <h2 className="text-xl font-semibold mb-4 capitalize">
-        {t(status as any)}
-      </h2>
-      {tasks
-        .filter(task => task.status === status)
-        .map((task, index) => (
-          <Draggable
-            key={task.id}
-            draggableId={String(task.id)}
-            index={index}
-          >
-            {(provided, snapshot) => renderTaskCard(provided, snapshot, task)}
-          </Draggable>
-        ))}
-      {provided.placeholder}
-    </div>
-  );
-
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      isDarkMode ? 'dark bg-background-dark text-text-dark' : 'bg-background-light text-text-light'
-    }`}>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Todo App</h1>
@@ -226,19 +176,55 @@ const TodoApp: React.FC = () => {
               </button>
             </div>
             <button
-              onClick={() => setIsAddingTask(true)}
-              className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
-            >
-              {t('add_task')}
-            </button>
-            <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-lg bg-primary-light dark:bg-primary-dark text-white"
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700"
             >
               {isDarkMode ? '🌞' : '🌙'}
             </button>
           </div>
         </header>
+
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TASK_STATUSES.map((status) => (
+              <Droppable key={status} droppableId={status}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg ${
+                      snapshot.isDraggingOver ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                  >
+                    <h2 className="text-xl font-semibold mb-4">
+                      {t(status)}
+                    </h2>
+                    {tasks
+                      .filter(task => task.status === status)
+                      .map((task, index) => (
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id.toString()}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <TaskCard
+                              task={task}
+                              index={index}
+                              labels={labels}
+                              isDragging={snapshot.isDragging}
+                              onDelete={handleDeleteTask}
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </div>
+        </DragDropContext>
 
         <AnimatePresence>
           {isAddingTask && (
@@ -271,30 +257,6 @@ const TodoApp: React.FC = () => {
                       rows={3}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">{t('labels')}</label>
-                    <div className="flex flex-wrap gap-2">
-                      {labels.map(label => (
-                        <button
-                          key={label.name}
-                          onClick={() => toggleLabel(label.name)}
-                          className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                            newTask.labels?.includes(label.name)
-                              ? 'text-white'
-                              : 'text-gray-700 dark:text-gray-300'
-                          }`}
-                          style={{
-                            backgroundColor: newTask.labels?.includes(label.name)
-                              ? label.color
-                              : 'transparent',
-                            border: `1px solid ${label.color}`
-                          }}
-                        >
-                          {label.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => setIsAddingTask(false)}
@@ -315,52 +277,24 @@ const TodoApp: React.FC = () => {
           )}
         </AnimatePresence>
 
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TASK_STATUSES.map((status) => (
-              <Droppable key={status} droppableId={status}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className={`bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg ${
-                      snapshot.isDraggingOver ? 'ring-2 ring-blue-500' : ''
-                    }`}
-                  >
-                    <h2 className="text-xl font-semibold mb-4">
-                      {t(status as any)}
-                    </h2>
-                    {tasks
-                      .filter(task => task.status === status)
-                      .map((task, index) => (
-                        <Draggable
-                          key={task.id}
-                          draggableId={task.id.toString()}
-                          index={index}
-                        >
-                          {(provided, snapshot) => renderTaskCard(provided, snapshot, task)}
-                        </Draggable>
-                      ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            ))}
-          </div>
-        </DragDropContext>
-
-        <AnimatePresence>
-          {showSuccess && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg"
-            >
-              {t('congratulations')}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <button
+          onClick={() => setIsAddingTask(true)}
+          className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-colors"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );

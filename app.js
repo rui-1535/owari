@@ -22,9 +22,9 @@ class TodoApp {
                 'status.todo': '未着手',
                 'status.in_progress': '進行中',
                 'status.done': '完了',
-                'label.important': '重要',
-                'label.urgent': '緊急',
-                'label.normal': '通常',
+                'label.todo': '未着手',
+                'label.in_progress': '進行中',
+                'label.done': '完了',
                 'completion.title': '🎉 おめでとうございます！ 🎉',
                 'completion.message': 'すべてのタスクが完了しました！',
                 'completion.continue': '続ける'
@@ -39,9 +39,9 @@ class TodoApp {
                 'status.todo': 'To Do',
                 'status.in_progress': 'In Progress',
                 'status.done': 'Done',
-                'label.important': 'Important',
-                'label.urgent': 'Urgent',
-                'label.normal': 'Normal',
+                'label.todo': 'To Do',
+                'label.in_progress': 'In Progress',
+                'label.done': 'Done',
                 'completion.title': '🎉 Congratulations! 🎉',
                 'completion.message': 'All tasks have been completed!',
                 'completion.continue': 'Continue'
@@ -156,10 +156,10 @@ class TodoApp {
     }
 
     updateLabelFilter() {
-        const options = ['<option value="all">すべてのラベル</option>'];
-        const labels = ['重要', '緊急', '通常'];
+        const options = ['<option value="all">' + this.translations[this.currentLang]['filter.all'] + '</option>'];
+        const labels = ['todo', 'in_progress', 'done'];
         labels.forEach(label => {
-            options.push(`<option value="${label}">${label}</option>`);
+            options.push(`<option value="${label}">${this.translations[this.currentLang][`label.${label}`]}</option>`);
         });
         this.labelFilter.innerHTML = options.join('');
     }
@@ -216,11 +216,15 @@ class TodoApp {
         taskElement.draggable = true;
 
         taskElement.innerHTML = `
-            <span class="task-text">${task.text}</span>
-            <div class="task-labels">
-                <span class="task-label" data-label="${task.label}">${task.label}</span>
+            <div class="task-content">
+                <span class="task-text">${task.text}</span>
+                <div class="task-labels">
+                    <span class="task-label status-label" data-status="${task.status}">
+                        ${this.translations[this.currentLang][`status.${task.status}`]}
+                    </span>
+                </div>
             </div>
-            <button class="delete-btn">削除</button>
+            <button class="delete-btn" title="${this.currentLang === 'ja' ? '削除' : 'Delete'}">×</button>
         `;
 
         return taskElement;

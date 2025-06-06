@@ -248,129 +248,98 @@ select:focus {
 }
 
 .task-item {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: center;
     cursor: move;
-    transition: all 0.2s ease;
-    position: relative;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .task-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.task-item.dragging {
+    opacity: 0.5;
+    background: var(--bg-hover);
+}
+
+.task-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .task-text {
-    font-size: 1.1rem;
-    word-break: break-word;
-    padding-right: 100px;
-    margin-bottom: 0.5rem;
-    color: var(--text-color);
-    font-weight: 500;
-    display: block;
-    width: 100%;
-}
-
-.task-status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-}
-
-.status-todo {
-    background-color: #ffcdd2;
-    color: #c62828;
-}
-
-.status-in-progress {
-    background-color: #fff9c4;
-    color: #f9a825;
-}
-
-.status-done {
-    background-color: #c8e6c9;
-    color: #2e7d32;
+    font-size: 1rem;
+    color: var(--text-primary);
 }
 
 .task-labels {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
     display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    z-index: 1;
+    gap: 8px;
 }
 
 .task-label {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
-/* ラベルの色設定 */
-.task-label[data-label="重要"] {
-    background-color: #ffebee;
-    color: #c62828;
-    border: 1px solid #c62828;
+.status-label {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
 }
 
-.task-label[data-label="緊急"] {
-    background-color: #fff8e1;
-    color: #f9a825;
-    border: 1px solid #f9a825;
+.status-label[data-status="todo"] {
+    background: #e3e3e3;
+    color: #666;
 }
 
-.task-label[data-label="通常"] {
-    background-color: #e3f2fd;
-    color: #1565c0;
-    border: 1px solid #1565c0;
+.status-label[data-status="in_progress"] {
+    background: #fff3cd;
+    color: #856404;
 }
 
-/* ダークモードでのラベル色 */
-[data-theme="dark"] .task-label[data-label="重要"] {
-    background-color: #4a1c1c;
-    color: #ff8a8a;
-    border-color: #ff8a8a;
-}
-
-[data-theme="dark"] .task-label[data-label="緊急"] {
-    background-color: #4a3c1c;
-    color: #ffd54f;
-    border-color: #ffd54f;
-}
-
-[data-theme="dark"] .task-label[data-label="通常"] {
-    background-color: #1c3c4a;
-    color: #64b5f6;
-    border-color: #64b5f6;
+.status-label[data-status="done"] {
+    background: #d4edda;
+    color: #155724;
 }
 
 .delete-btn {
-    align-self: flex-end;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    background-color: #ff4444;
-    color: white;
+    background: none;
     border: none;
-    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
     transition: all 0.2s ease;
 }
 
 .delete-btn:hover {
-    background-color: #ff0000;
-    transform: scale(1.05);
+    background: var(--bg-hover);
+    color: #dc3545;
+}
+
+.task-list {
+    min-height: 100px;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--bg-primary);
+    transition: background-color 0.3s ease;
+}
+
+.task-list.drag-over {
+    background: var(--bg-hover);
 }
 
 @media (min-width: 768px) {
