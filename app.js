@@ -275,18 +275,15 @@ class TodoApp {
     }
 
     setupTaskEventListeners() {
-        document.querySelectorAll('.task-item').forEach(item => {
-            const deleteBtn = item.querySelector('.delete-btn');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', async () => {
-                    const taskId = item.dataset.id;
-                    item.classList.add('deleting');
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    this.tasks = this.tasks.filter(task => task.id !== taskId);
-                    await this.saveTasks();
-                    item.remove();
-                });
-            }
+        // 削除ボタンのイベントリスナーを設定
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const taskElement = e.target.closest('.task-item');
+                const taskId = taskElement.dataset.id;
+                this.tasks = this.tasks.filter(t => t.id !== taskId);
+                await this.saveTasks();
+                taskElement.remove();
+            });
         });
     }
 
