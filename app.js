@@ -151,18 +151,22 @@ class TodoApp {
 
         this.tasks.push(task);
         await this.saveTasks();
-        this.renderTasks();
+        
+        // タスクを直接追加
+        const taskElement = this.createTaskElement(task);
+        const targetList = document.getElementById(`${selectedStatus}-list`);
+        if (targetList) {
+            targetList.appendChild(taskElement);
+            taskElement.classList.add('animate__animated', 'animate__fadeIn');
+        }
         
         // 入力フィールドをクリア
         this.taskInput.value = '';
         // ラベルをデフォルト（todo）に戻す
         this.labelSelect.value = 'todo';
 
-        // タスク追加時のアニメーション
-        const taskElement = document.querySelector(`[data-id="${task.id}"]`);
-        if (taskElement) {
-            taskElement.classList.add('animate__animated', 'animate__fadeIn');
-        }
+        // タスクのイベントリスナーを設定
+        this.setupTaskEventListeners();
     }
 
     async saveTasks() {
@@ -247,20 +251,31 @@ class TodoApp {
             <button class="delete-btn" title="${this.currentLang === 'ja' ? '削除' : 'Delete'}">×</button>
         `;
 
+        // ドラッグ＆ドロップのイベントリスナーを設定
+        taskElement.addEventListener('dragstart', () => {
+            taskElement.classList.add('dragging');
+        });
+
+        taskElement.addEventListener('dragend', () => {
+            taskElement.classList.remove('dragging');
+        });
+
         return taskElement;
     }
 
     setupTaskEventListeners() {
         document.querySelectorAll('.task-item').forEach(item => {
             const deleteBtn = item.querySelector('.delete-btn');
-            deleteBtn.addEventListener('click', async () => {
-                const taskId = item.dataset.id;
-                item.classList.add('deleting');
-                await new Promise(resolve => setTimeout(resolve, 300));
-                this.tasks = this.tasks.filter(task => task.id !== taskId);
-                await this.saveTasks();
-                this.renderTasks();
-            });
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', async () => {
+                    const taskId = item.dataset.id;
+                    item.classList.add('deleting');
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    this.tasks = this.tasks.filter(task => task.id !== taskId);
+                    await this.saveTasks();
+                    item.remove();
+                });
+            }
         });
     }
 
