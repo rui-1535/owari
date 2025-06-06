@@ -120,11 +120,12 @@ class TodoApp {
         if (!text) return;
 
         const selectedLabel = this.labelSelect.value;
+        const selectedStatus = this.labelSelect.value; // ラベル選択をステータスとして使用
 
         const task = {
             id: Date.now().toString(),
             text,
-            status: 'todo',
+            status: selectedStatus, // 選択されたラベルをステータスとして設定
             label: selectedLabel,
             createdAt: new Date().toISOString()
         };
@@ -135,8 +136,8 @@ class TodoApp {
         
         // 入力フィールドをクリア
         this.taskInput.value = '';
-        // ラベルをデフォルト（重要）に戻す
-        this.labelSelect.value = '重要';
+        // ラベルをデフォルト（todo）に戻す
+        this.labelSelect.value = 'todo';
 
         // タスク追加時のアニメーション
         const taskElement = document.querySelector(`[data-id="${task.id}"]`);
