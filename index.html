@@ -4,8 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToDo App</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <header>
+            <h1>ToDo App</h1>
+            <div class="controls">
+                <button id="theme-toggle" title="ダークモードに切り替え">🌙</button>
+                <button id="lang-toggle" title="言語を切り替え">🌐</button>
+            </div>
+        </header>
+
+        <div class="task-input-container">
+            <input type="text" id="task-input" placeholder="新しいタスクを入力...">
+            <select id="label-select">
+                <option value="todo">未着手</option>
+                <option value="in_progress">進行中</option>
+                <option value="done">完了</option>
+            </select>
+            <button id="add-task-btn">追加</button>
+        </div>
+
+        <div class="filters">
+            <select id="status-filter">
+                <option value="all">すべてのステータス</option>
+                <option value="todo">未着手</option>
+                <option value="in_progress">進行中</option>
+                <option value="done">完了</option>
+            </select>
+            <select id="label-filter">
+                <option value="all">すべてのラベル</option>
+            </select>
+        </div>
+
+        <div class="task-groups">
+            <div class="task-group" data-status="todo">
+                <h2>未着手</h2>
+                <div id="todo-list" class="task-list"></div>
+            </div>
+            <div class="task-group" data-status="in_progress">
+                <h2>進行中</h2>
+                <div id="in-progress-list" class="task-list"></div>
+            </div>
+            <div class="task-group" data-status="done">
+                <h2>完了</h2>
+                <div id="done-list" class="task-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="completion-message" class="completion-message hidden">
+        <div class="completion-content">
+            <h2>🎉 おめでとうございます！ 🎉</h2>
+            <p>すべてのタスクが完了しました！</p>
+            <button onclick="hideCompletionMessage()">続ける</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html> 
