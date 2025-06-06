@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "シンプルで使いやすいタスク管理アプリケーション",
   "main": "app.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "homepage": "https://rui-1535.github.io/owari",
   "scripts": {
     "start": "serve .",
