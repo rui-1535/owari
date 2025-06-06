@@ -100,18 +100,7 @@ class TodoApp {
     }
 
     setupDragAndDrop() {
-        const taskItems = document.querySelectorAll('.task-item');
         const taskLists = document.querySelectorAll('.task-list');
-
-        taskItems.forEach(item => {
-            item.addEventListener('dragstart', () => {
-                item.classList.add('dragging');
-            });
-
-            item.addEventListener('dragend', () => {
-                item.classList.remove('dragging');
-            });
-        });
 
         taskLists.forEach(list => {
             list.addEventListener('dragover', e => {
@@ -129,9 +118,28 @@ class TodoApp {
 
             list.addEventListener('drop', async e => {
                 e.preventDefault();
-                const taskId = e.dataTransfer.getData('text/plain');
-                const newStatus = list.closest('.task-group').dataset.status;
-                await this.updateTaskStatus(taskId, newStatus);
+                const draggingItem = document.querySelector('.dragging');
+                if (draggingItem) {
+                    const taskId = draggingItem.dataset.id;
+                    const newStatus = list.closest('.task-group').dataset.status;
+                    
+                    // タスクのステータスを更新
+                    const task = this.tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.status = newStatus;
+                        await this.saveTasks();
+                        
+                        // タスクのラベルを更新
+                        const statusLabel = draggingItem.querySelector('.status-label');
+                        if (statusLabel) {
+                            statusLabel.textContent = this.translations[this.currentLang][`status.${newStatus}`];
+                            statusLabel.dataset.status = newStatus;
+                        }
+                        
+                        // タスクのクラスを更新
+                        draggingItem.className = `task-item status-${newStatus}`;
+                    }
+                }
             });
         });
     }
@@ -292,28 +300,6 @@ class TodoApp {
                 return closest;
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    async updateTaskStatus(taskId, newStatus) {
-        const task = this.tasks.find(t => t.id === taskId);
-        if (task) {
-            const taskElement = document.querySelector(`[data-id="${taskId}"]`);
-            if (taskElement) {
-                taskElement.classList.add('status-changing');
-                setTimeout(() => {
-                    taskElement.classList.remove('status-changing');
-                }, 500);
-            }
-
-            task.status = newStatus;
-            await this.saveTasks();
-            this.renderTasks();
-
-            const allDone = this.tasks.every(t => t.status === 'done');
-            if (allDone && this.tasks.length > 0) {
-                showCompletionMessage();
-            }
-        }
     }
 
     toggleTheme() {
