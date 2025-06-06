@@ -101,6 +101,18 @@ class TodoApp {
 
     setupDragAndDrop() {
         const taskLists = document.querySelectorAll('.task-list');
+        const taskItems = document.querySelectorAll('.task-item');
+
+        // タスクアイテムにドラッグ可能な属性を設定
+        taskItems.forEach(item => {
+            item.setAttribute('draggable', 'true');
+            item.addEventListener('dragstart', () => {
+                item.classList.add('dragging');
+            });
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+            });
+        });
 
         taskLists.forEach(list => {
             list.addEventListener('dragover', e => {
@@ -245,7 +257,7 @@ class TodoApp {
         const taskElement = document.createElement('div');
         taskElement.className = `task-item status-${task.status}`;
         taskElement.dataset.id = task.id;
-        taskElement.draggable = true;
+        taskElement.setAttribute('draggable', 'true');
 
         taskElement.innerHTML = `
             <div class="task-content">
