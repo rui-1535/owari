@@ -24,5 +24,8 @@
   "homepage": "https://github.com/rui-1535/owari#readme",
   "dependencies": {
     "serve": "^14.2.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
