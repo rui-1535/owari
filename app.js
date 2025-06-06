@@ -101,20 +101,10 @@ class TodoApp {
 
     setupDragAndDrop() {
         const taskLists = document.querySelectorAll('.task-list');
-        const taskItems = document.querySelectorAll('.task-item');
 
-        // タスクアイテムにドラッグ可能な属性を設定
-        taskItems.forEach(item => {
-            item.setAttribute('draggable', 'true');
-            item.addEventListener('dragstart', () => {
-                item.classList.add('dragging');
-            });
-            item.addEventListener('dragend', () => {
-                item.classList.remove('dragging');
-            });
-        });
-
+        // 各タスクリストに対してドラッグ＆ドロップイベントを設定
         taskLists.forEach(list => {
+            // ドラッグオーバー時の処理
             list.addEventListener('dragover', e => {
                 e.preventDefault();
                 const draggingItem = document.querySelector('.dragging');
@@ -128,6 +118,7 @@ class TodoApp {
                 }
             });
 
+            // ドロップ時の処理
             list.addEventListener('drop', async e => {
                 e.preventDefault();
                 const draggingItem = document.querySelector('.dragging');
@@ -230,7 +221,7 @@ class TodoApp {
         this.renderTasks(tasks);
     }
 
-    renderTasks(tasks) {
+    renderTasks(tasks = this.tasks) {
         const todoList = document.getElementById('todo-list');
         const inProgressList = document.getElementById('in-progress-list');
         const doneList = document.getElementById('done-list');
@@ -249,7 +240,7 @@ class TodoApp {
             }
         });
 
-        this.setupTaskEventListeners();
+        // ドラッグ＆ドロップの設定を更新
         this.setupDragAndDrop();
     }
 
