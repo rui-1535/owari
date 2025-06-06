@@ -55,6 +55,32 @@ h1 {
 .controls {
     display: flex;
     gap: 1rem;
+    align-items: center;
+}
+
+.language-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.language-controls button {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.language-controls button:hover {
+    background: var(--bg-hover);
+    transform: translateY(-2px);
+}
+
+.language-controls button.active {
+    background: var(--bg-tertiary);
+    border-color: var(--text-primary);
 }
 
 button {

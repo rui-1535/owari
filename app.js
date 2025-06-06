@@ -45,6 +45,23 @@ class TodoApp {
                 'completion.title': '🎉 Congratulations! 🎉',
                 'completion.message': 'All tasks have been completed!',
                 'completion.continue': 'Continue'
+            },
+            zh: {
+                'app.title': '待办事项应用',
+                'task.input.placeholder': '输入新任务...',
+                'task.add': '添加',
+                'filter.status': '按状态筛选',
+                'filter.label': '按标签筛选',
+                'filter.all': '所有标签',
+                'status.todo': '待办',
+                'status.in_progress': '进行中',
+                'status.done': '已完成',
+                'label.todo': '待办',
+                'label.in_progress': '进行中',
+                'label.done': '已完成',
+                'completion.title': '🎉 恭喜！ 🎉',
+                'completion.message': '所有任务都已完成！',
+                'completion.continue': '继续'
             }
         };
 
@@ -75,7 +92,11 @@ class TodoApp {
         this.statusFilter.addEventListener('change', () => this.filterTasks());
         this.labelFilter.addEventListener('change', () => this.filterTasks());
         this.themeToggle.addEventListener('click', () => this.toggleTheme());
-        this.langToggle.addEventListener('click', () => this.toggleLanguage());
+        
+        // 言語切り替えボタンのイベントリスナー
+        document.getElementById('lang-ja').addEventListener('click', () => this.setLanguage('ja'));
+        document.getElementById('lang-en').addEventListener('click', () => this.setLanguage('en'));
+        document.getElementById('lang-zh').addEventListener('click', () => this.setLanguage('zh'));
     }
 
     setupDragAndDrop() {
@@ -119,14 +140,12 @@ class TodoApp {
         const text = this.taskInput.value.trim();
         if (!text) return;
 
-        const selectedLabel = this.labelSelect.value;
-        const selectedStatus = this.labelSelect.value; // ラベル選択をステータスとして使用
+        const selectedStatus = this.labelSelect.value;
 
         const task = {
             id: Date.now().toString(),
             text,
-            status: selectedStatus, // 選択されたラベルをステータスとして設定
-            label: selectedLabel,
+            status: selectedStatus,
             createdAt: new Date().toISOString()
         };
 
@@ -290,36 +309,41 @@ class TodoApp {
         this.themeToggle.setAttribute('title', this.currentTheme === 'light' ? 'ダークモードに切り替え' : 'ライトモードに切り替え');
     }
 
-    toggleLanguage() {
-        this.currentLang = this.currentLang === 'ja' ? 'en' : 'ja';
-        localStorage.setItem('lang', this.currentLang);
+    setLanguage(lang) {
+        this.currentLang = lang;
+        localStorage.setItem('lang', lang);
         this.updateLanguage();
-        this.langToggle.textContent = this.currentLang === 'ja' ? '🇯🇵' : '🇺🇸';
-        this.langToggle.setAttribute('title', this.currentLang === 'ja' ? 'Switch to English' : '日本語に切り替え');
     }
 
     updateLanguage() {
-        document.querySelectorAll('[data-i18n]').forEach(element => {
-            const key = element.getAttribute('data-i18n');
-            if (this.translations[this.currentLang][key]) {
-                element.textContent = this.translations[this.currentLang][key];
-            }
-        });
+        document.querySelector('h1').textContent = this.translations[this.currentLang]['app.title'];
+        this.taskInput.placeholder = this.translations[this.currentLang]['task.input.placeholder'];
+        this.addTaskBtn.textContent = this.translations[this.currentLang]['task.add'];
+        
+        // ステータスフィルターの更新
+        const statusOptions = [
+            `<option value="all">${this.translations[this.currentLang]['filter.all']}</option>`,
+            `<option value="todo">${this.translations[this.currentLang]['status.todo']}</option>`,
+            `<option value="in_progress">${this.translations[this.currentLang]['status.in_progress']}</option>`,
+            `<option value="done">${this.translations[this.currentLang]['status.done']}</option>`
+        ];
+        this.statusFilter.innerHTML = statusOptions.join('');
 
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-            const key = element.getAttribute('data-i18n-placeholder');
-            if (this.translations[this.currentLang][key]) {
-                element.placeholder = this.translations[this.currentLang][key];
-            }
-        });
+        // タスクグループのタイトル更新
+        document.querySelector('[data-status="todo"] h2').textContent = this.translations[this.currentLang]['status.todo'];
+        document.querySelector('[data-status="in_progress"] h2').textContent = this.translations[this.currentLang]['status.in_progress'];
+        document.querySelector('[data-status="done"] h2').textContent = this.translations[this.currentLang]['status.done'];
 
-        // Update select options
-        document.querySelectorAll('select option[data-i18n]').forEach(option => {
-            const key = option.getAttribute('data-i18n');
-            if (this.translations[this.currentLang][key]) {
-                option.textContent = this.translations[this.currentLang][key];
-            }
-        });
+        // 完了メッセージの更新
+        const completionMessage = document.getElementById('completion-message');
+        if (completionMessage) {
+            completionMessage.querySelector('h2').textContent = this.translations[this.currentLang]['completion.title'];
+            completionMessage.querySelector('p').textContent = this.translations[this.currentLang]['completion.message'];
+            completionMessage.querySelector('button').textContent = this.translations[this.currentLang]['completion.continue'];
+        }
+
+        // タスクの再レンダリング
+        this.renderTasks();
     }
 }
 
