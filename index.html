@@ -11,6 +11,12 @@
     <div class="container">
         <header>
             <div class="header-left">
+                <button id="kebab-menu" class="kebab-menu">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div id="kebab-dropdown" class="kebab-dropdown hidden">
+                    <button id="show-manual">説明書</button>
+                </div>
                 <i class="fas fa-sticky-note note-icon"></i>
                 <h1>ToDo App</h1>
             </div>
@@ -58,6 +64,32 @@
             <div class="task-group" data-status="done">
                 <h2>完了</h2>
                 <div id="done-list" class="task-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="manual-modal" class="modal hidden">
+        <div class="modal-content">
+            <button id="close-manual" class="close-button">&times;</button>
+            <h2>ToDoアプリの使い方</h2>
+            <div class="manual-content">
+                <h3>基本機能</h3>
+                <ul>
+                    <li>タスクの追加：上部の入力欄にタスクを入力し、「追加」ボタンをクリックします。</li>
+                    <li>タスクの移動：タスクをドラッグ＆ドロップで異なるステータス（未着手、進行中、完了）に移動できます。</li>
+                    <li>タスクの編集：タスクをクリックして内容を編集できます。</li>
+                    <li>タスクの削除：タスクの削除ボタンをクリックして削除できます。</li>
+                </ul>
+                <h3>フィルター機能</h3>
+                <ul>
+                    <li>ステータスフィルター：タスクの状態（未着手、進行中、完了）でフィルタリングできます。</li>
+                    <li>ラベルフィルター：タスクに付けたラベルでフィルタリングできます。</li>
+                </ul>
+                <h3>その他の機能</h3>
+                <ul>
+                    <li>ダークモード：右上の🌙ボタンでダークモードとライトモードを切り替えられます。</li>
+                    <li>多言語対応：日本語、英語、中国語に対応しています。</li>
+                </ul>
             </div>
         </div>
     </div>

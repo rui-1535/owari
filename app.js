@@ -362,4 +362,44 @@ function showCompletionMessage() {
 function hideCompletionMessage() {
     const message = document.getElementById('completion-message');
     message.classList.remove('show');
-} 
+}
+
+// ケバブメニューとモーダルの機能
+document.addEventListener('DOMContentLoaded', function() {
+    const kebabMenu = document.getElementById('kebab-menu');
+    const kebabDropdown = document.getElementById('kebab-dropdown');
+    const showManual = document.getElementById('show-manual');
+    const manualModal = document.getElementById('manual-modal');
+    const closeManual = document.getElementById('close-manual');
+
+    // ケバブメニューの表示/非表示
+    kebabMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+        kebabDropdown.classList.toggle('hidden');
+    });
+
+    // ドロップダウンメニュー以外をクリックしたら閉じる
+    document.addEventListener('click', function(e) {
+        if (!kebabDropdown.contains(e.target) && e.target !== kebabMenu) {
+            kebabDropdown.classList.add('hidden');
+        }
+    });
+
+    // 説明書モーダルを表示
+    showManual.addEventListener('click', function() {
+        manualModal.classList.remove('hidden');
+        kebabDropdown.classList.add('hidden');
+    });
+
+    // 説明書モーダルを閉じる
+    closeManual.addEventListener('click', function() {
+        manualModal.classList.add('hidden');
+    });
+
+    // モーダルの外側をクリックしたら閉じる
+    manualModal.addEventListener('click', function(e) {
+        if (e.target === manualModal) {
+            manualModal.classList.add('hidden');
+        }
+    });
+}); 
