@@ -258,30 +258,25 @@ class TodoApp {
 
     createTaskElement(task) {
         const taskElement = document.createElement('div');
+        taskElement.id = task.id;
         taskElement.className = `task-item status-${task.status}`;
-        taskElement.dataset.id = task.id;
-        taskElement.setAttribute('draggable', 'true');
+        taskElement.draggable = true;
 
-        taskElement.innerHTML = `
-            <div class="task-content">
-                <span class="task-text">${task.text}</span>
-                <div class="task-labels">
-                    <span class="task-label status-label" data-status="${task.status}">
-                        ${this.translations[this.currentLang][`status.${task.status}`]}
-                    </span>
-                </div>
-            </div>
-            <button class="delete-btn" title="${this.currentLang === 'ja' ? '削除' : 'Delete'}">×</button>
-        `;
+        const taskContent = document.createElement('div');
+        taskContent.className = 'task-content';
 
-        // ドラッグ＆ドロップのイベントリスナーを設定
-        taskElement.addEventListener('dragstart', () => {
-            taskElement.classList.add('dragging');
-        });
+        const taskText = document.createElement('span');
+        taskText.className = 'task-text';
+        taskText.textContent = task.text;
 
-        taskElement.addEventListener('dragend', () => {
-            taskElement.classList.remove('dragging');
-        });
+        const statusLabel = document.createElement('span');
+        statusLabel.className = 'status-label';
+        statusLabel.textContent = this.translations[this.currentLang][`status.${task.status}`];
+        statusLabel.dataset.status = task.status;
+
+        taskContent.appendChild(taskText);
+        taskContent.appendChild(statusLabel);
+        taskElement.appendChild(taskContent);
 
         return taskElement;
     }
