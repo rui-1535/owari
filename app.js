@@ -10,6 +10,7 @@ class TodoApp {
         this.currentTheme = localStorage.getItem('theme') || 'light';
         this.currentLang = localStorage.getItem('lang') || 'ja';
         this.tasks = [];
+        this.hasTasksInProgress = false;
 
         this.translations = {
             ja: {
@@ -178,6 +179,9 @@ class TodoApp {
 
         // タスクのイベントリスナーを設定
         this.setupTaskEventListeners();
+
+        // タスクの追加時にフラグをリセット
+        this.onTaskAdded();
     }
 
     async saveTasks() {
@@ -346,6 +350,82 @@ class TodoApp {
         // タスクの再レンダリング
         this.renderTasks();
     }
+
+    // タスクの完了状態をチェック
+    checkAllTasksCompleted() {
+        const todoList = document.getElementById('todo-list');
+        const inProgressList = document.getElementById('in-progress-list');
+        const doneList = document.getElementById('done-list');
+        
+        // 未着手または進行中にタスクがある場合、フラグを立てる
+        if (todoList.children.length > 0 || inProgressList.children.length > 0) {
+            this.hasTasksInProgress = true;
+        }
+        
+        // 未着手と進行中のタスクがなく、完了タスクが1つ以上あり、
+        // かつ以前に未着手または進行中のタスクがあった場合
+        if (this.hasTasksInProgress && 
+            todoList.children.length === 0 && 
+            inProgressList.children.length === 0 && 
+            doneList.children.length > 0) {
+            this.showCompletionMessage();
+            this.hasTasksInProgress = false; // フラグをリセット
+        }
+    }
+
+    // タスクの移動後に完了状態をチェック
+    onTaskMoved() {
+        setTimeout(() => this.checkAllTasksCompleted(), 100);
+    }
+
+    // タスクの追加時にフラグをリセット
+    onTaskAdded() {
+        this.hasTasksInProgress = false;
+    }
+
+    // 完了メッセージの表示
+    showCompletionMessage() {
+        const message = document.getElementById('completion-message');
+        message.classList.remove('hidden');
+        this.createConfetti();
+        
+        // 2秒後にメッセージを非表示
+        setTimeout(() => {
+            this.hideCompletionMessage();
+        }, 2000);
+    }
+
+    // 完了メッセージの非表示
+    hideCompletionMessage() {
+        const message = document.getElementById('completion-message');
+        message.classList.add('hidden');
+        const container = document.querySelector('.confetti-container');
+        container.innerHTML = '';
+    }
+
+    // クラッカーエフェクトの生成
+    createConfetti() {
+        const container = document.querySelector('.confetti-container');
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+        
+        // 中央から放射状に広がるように配置
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // 中央からランダムな角度で発射
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 200 + 50; // 50pxから250pxの範囲
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+            
+            confetti.style.left = `calc(50% + ${x}px)`;
+            confetti.style.top = `calc(50% + ${y}px)`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            container.appendChild(confetti);
+        }
+    }
 }
 
 // Initialize the app when the DOM is loaded
@@ -370,67 +450,4 @@ document.addEventListener('DOMContentLoaded', function() {
             kebabDropdown.classList.add('hidden');
         }
     });
-});
-
-// クラッカーエフェクトの生成
-function createConfetti() {
-    const container = document.querySelector('.confetti-container');
-    const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
-    
-    // 中央から放射状に広がるように配置
-    for (let i = 0; i < 100; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        
-        // 中央からランダムな角度で発射
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 200 + 50; // 50pxから250pxの範囲
-        const x = Math.cos(angle) * distance;
-        const y = Math.sin(angle) * distance;
-        
-        confetti.style.left = `calc(50% + ${x}px)`;
-        confetti.style.top = `calc(50% + ${y}px)`;
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = Math.random() * 2 + 's'; // 2秒以内にランダムな遅延
-        container.appendChild(confetti);
-    }
-}
-
-// 完了メッセージの表示
-function showCompletionMessage() {
-    const message = document.getElementById('completion-message');
-    message.classList.remove('hidden');
-    createConfetti();
-    
-    // 2秒後にメッセージを非表示
-    setTimeout(() => {
-        hideCompletionMessage();
-    }, 2000);
-}
-
-// 完了メッセージの非表示
-function hideCompletionMessage() {
-    const message = document.getElementById('completion-message');
-    message.classList.add('hidden');
-    const container = document.querySelector('.confetti-container');
-    container.innerHTML = '';
-}
-
-// タスクの完了状態をチェック
-function checkAllTasksCompleted() {
-    const todoList = document.getElementById('todo-list');
-    const inProgressList = document.getElementById('in-progress-list');
-    const doneList = document.getElementById('done-list');
-    
-    // 未着手と進行中のタスクがなく、完了タスクが1つ以上ある場合
-    if (todoList.children.length === 0 && 
-        inProgressList.children.length === 0 && 
-        doneList.children.length > 0) {
-        showCompletionMessage();
-    }
-}
-
-// タスクの移動後に完了状態をチェック
-function onTaskMoved() {
-    setTimeout(checkAllTasksCompleted, 100); // 少し遅延を入れて確実にチェック
-} 
+}); 
