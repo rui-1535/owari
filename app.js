@@ -127,7 +127,7 @@ class TodoApp {
                 }
             });
 
-            list.addEventListener('drop', (e) => {
+            list.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 const taskId = e.dataTransfer.getData('text/plain');
                 const task = document.getElementById(taskId);
@@ -137,8 +137,20 @@ class TodoApp {
                 const taskIndex = this.tasks.findIndex(t => t.id === taskId);
                 if (taskIndex !== -1) {
                     this.tasks[taskIndex].status = newStatus;
-                    this.saveTasks();
-                    this.onTaskMoved(); // タスク移動後に完了チェックを実行
+                    await this.saveTasks();
+                    
+                    // タスクのラベルを更新
+                    const statusLabel = task.querySelector('.status-label');
+                    if (statusLabel) {
+                        statusLabel.textContent = this.translations[this.currentLang][`status.${newStatus}`];
+                        statusLabel.dataset.status = newStatus;
+                    }
+                    
+                    // タスクのクラスを更新
+                    task.className = `task-item status-${newStatus}`;
+                    
+                    // タスク移動後に完了チェックを実行
+                    this.onTaskMoved();
                 }
             });
         });
