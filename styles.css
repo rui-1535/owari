@@ -307,49 +307,109 @@ select {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.completion-message.hidden {
-    display: none;
+.completion-message.visible {
+    opacity: 1;
+    visibility: visible;
 }
 
 .completion-content {
     background-color: var(--bg-primary);
-    padding: 2rem;
-    border-radius: 8px;
+    padding: 40px;
+    border-radius: 10px;
     text-align: center;
-    box-shadow: 0 4px 8px var(--shadow-color);
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: pop-in 0.5s ease-out;
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .completion-content h2 {
-    margin-bottom: 1rem;
     color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 2em;
 }
 
 .completion-content p {
-    margin-bottom: 1.5rem;
     color: var(--text-secondary);
+    font-size: 1.2em;
+    margin-bottom: 30px;
 }
 
-.completion-content button {
-    padding: 0.75rem 1.5rem;
-    background-color: #4CAF50;
-    color: white;
+.close-completion-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
     border: none;
-    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 1.5em;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
 }
 
-.completion-content button:hover {
-    background-color: #45a049;
+.close-completion-btn:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    animation: confetti-fall 2s ease-in-out forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+[data-theme="dark"] .completion-content {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .close-completion-btn:hover {
+    background-color: var(--bg-tertiary);
 }
 
 .theme-toggle {

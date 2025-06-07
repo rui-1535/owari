@@ -13,6 +13,8 @@ class TodoApp {
         this.hasTasksInProgress = false;
         this.progressBar = document.getElementById('progress-bar');
         this.progressText = document.getElementById('progress-text');
+        this.completionMessage = document.getElementById('completion-message');
+        this.closeCompletionBtn = document.querySelector('.close-completion-btn');
 
         this.translations = {
             ja: {
@@ -100,6 +102,9 @@ class TodoApp {
         document.getElementById('lang-ja').addEventListener('click', () => this.setLanguage('ja'));
         document.getElementById('lang-en').addEventListener('click', () => this.setLanguage('en'));
         document.getElementById('lang-zh').addEventListener('click', () => this.setLanguage('zh'));
+
+        // 完了メッセージを閉じるボタンのイベントリスナー
+        this.closeCompletionBtn.addEventListener('click', () => this.hideCompletionMessage());
     }
 
     setupDragAndDrop() {
@@ -403,46 +408,29 @@ class TodoApp {
 
     // 完了メッセージの表示
     showCompletionMessage() {
-        console.log('Showing completion message and confetti');
-        const message = document.getElementById('completion-message');
-        message.classList.remove('hidden');
+        this.completionMessage.classList.remove('hidden');
+        this.completionMessage.classList.add('visible');
         this.createConfetti();
-        
-        // 2秒後にメッセージを非表示
-        setTimeout(() => {
-            this.hideCompletionMessage();
-        }, 2000);
     }
 
-    // 完了メッセージの非表示
     hideCompletionMessage() {
-        const message = document.getElementById('completion-message');
-        message.classList.add('hidden');
-        const container = document.querySelector('.confetti-container');
-        container.innerHTML = '';
+        this.completionMessage.classList.remove('visible');
+        setTimeout(() => {
+            this.completionMessage.classList.add('hidden');
+        }, 300);
     }
 
-    // クラッカーエフェクトの生成
     createConfetti() {
-        const container = document.querySelector('.confetti-container');
-        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+        const confettiContainer = document.querySelector('.confetti-container');
+        confettiContainer.innerHTML = '';
         
-        // 中央から放射状に広がるように配置
         for (let i = 0; i < 100; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
-            
-            // 中央からランダムな角度で発射
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 200 + 50; // 50pxから250pxの範囲
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
-            
-            confetti.style.left = `calc(50% + ${x}px)`;
-            confetti.style.top = `calc(50% + ${y}px)`;
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animationDelay = Math.random() * 2 + 's';
-            container.appendChild(confetti);
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.animationDelay = `${Math.random() * 2}s`;
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confettiContainer.appendChild(confetti);
         }
     }
 
