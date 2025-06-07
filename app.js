@@ -461,33 +461,43 @@ class TodoApp {
         }
     }
 
+    async deleteColumnTasks(status) {
+        // タスクリストから削除
+        const tasksToDelete = this.tasks.filter(task => task.status === status);
+        if (tasksToDelete.length > 0) {
+            this.tasks = this.tasks.filter(task => task.status !== status);
+            await this.saveTasks();
+
+            // UIから削除
+            const taskList = document.getElementById(`${status}-list`);
+            if (taskList) {
+                taskList.innerHTML = '';
+            }
+
+            // 進捗を更新
+            this.updateProgress();
+        }
+    }
+
     setupColumnDeleteButtons() {
         const deleteButtons = document.querySelectorAll('.delete-column-btn');
         deleteButtons.forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const status = button.dataset.status;
-                if (confirm(this.currentLang === 'ja' 
-                    ? `このカラムのタスクを全て削除してもよろしいですか？`
-                    : `Are you sure you want to delete all tasks in this column?`)) {
-                    this.deleteColumnTasks(status);
+                const taskList = document.getElementById(`${status}-list`);
+                const taskCount = taskList ? taskList.children.length : 0;
+                
+                if (taskCount > 0) {
+                    if (confirm(this.currentLang === 'ja' 
+                        ? `このカラムの${taskCount}個のタスクを全て削除してもよろしいですか？`
+                        : `Are you sure you want to delete all ${taskCount} tasks in this column?`)) {
+                        this.deleteColumnTasks(status);
+                    }
                 }
             });
         });
-    }
-
-    async deleteColumnTasks(status) {
-        // タスクリストから削除
-        this.tasks = this.tasks.filter(task => task.status !== status);
-        await this.saveTasks();
-
-        // UIから削除
-        const taskList = document.getElementById(`${status}-list`);
-        if (taskList) {
-            taskList.innerHTML = '';
-        }
-
-        // 進捗を更新
-        this.updateProgress();
     }
 }
 
