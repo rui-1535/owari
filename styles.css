@@ -989,4 +989,38 @@ select {
 
 [data-theme="dark"] .delete-btn:hover {
     color: #ff6b6b;
+}
+
+.task-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.delete-column-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.delete-column-btn:hover {
+    opacity: 1;
+    color: #ff4444;
+    background-color: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .delete-column-btn {
+    color: #ccc;
+}
+
+[data-theme="dark"] .delete-column-btn:hover {
+    color: #ff6b6b;
+    background-color: var(--bg-tertiary);
 } 

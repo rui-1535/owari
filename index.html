@@ -61,15 +61,24 @@
 
         <div class="task-groups">
             <div class="task-group" data-status="todo">
-                <h2>未着手</h2>
+                <div class="task-group-header">
+                    <h2>未着手</h2>
+                    <button class="delete-column-btn" data-status="todo" title="このカラムのタスクを全て削除">×</button>
+                </div>
                 <div id="todo-list" class="task-list"></div>
             </div>
             <div class="task-group" data-status="in_progress">
-                <h2>進行中</h2>
+                <div class="task-group-header">
+                    <h2>進行中</h2>
+                    <button class="delete-column-btn" data-status="in_progress" title="このカラムのタスクを全て削除">×</button>
+                </div>
                 <div id="in-progress-list" class="task-list"></div>
             </div>
             <div class="task-group" data-status="done">
-                <h2>完了</h2>
+                <div class="task-group-header">
+                    <h2>完了</h2>
+                    <button class="delete-column-btn" data-status="done" title="このカラムのタスクを全て削除">×</button>
+                </div>
                 <div id="done-list" class="task-list"></div>
             </div>
         </div>
