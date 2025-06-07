@@ -11,6 +11,8 @@ class TodoApp {
         this.currentLang = localStorage.getItem('lang') || 'ja';
         this.tasks = [];
         this.hasTasksInProgress = false;
+        this.progressBar = document.getElementById('progress-bar');
+        this.progressText = document.getElementById('progress-text');
 
         this.translations = {
             ja: {
@@ -190,6 +192,7 @@ class TodoApp {
 
         // タスクの追加時にフラグをリセット
         this.onTaskAdded();
+        this.updateProgress();
     }
 
     async saveTasks() {
@@ -274,9 +277,16 @@ class TodoApp {
         statusLabel.textContent = this.translations[this.currentLang][`status.${task.status}`];
         statusLabel.dataset.status = task.status;
 
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-btn';
+        deleteButton.innerHTML = '×';
+        deleteButton.title = this.currentLang === 'ja' ? '削除' : 'Delete';
+        deleteButton.addEventListener('click', () => this.deleteTask(task.id));
+
         taskContent.appendChild(taskText);
         taskContent.appendChild(statusLabel);
         taskElement.appendChild(taskContent);
+        taskElement.appendChild(deleteButton);
 
         return taskElement;
     }
@@ -382,6 +392,7 @@ class TodoApp {
     onTaskMoved() {
         console.log('Task moved, checking completion status');
         setTimeout(() => this.checkAllTasksCompleted(), 100);
+        this.updateProgress();
     }
 
     // タスクの追加時にフラグをリセット
@@ -432,6 +443,32 @@ class TodoApp {
             confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
             confetti.style.animationDelay = Math.random() * 2 + 's';
             container.appendChild(confetti);
+        }
+    }
+
+    async deleteTask(taskId) {
+        const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            this.tasks.splice(taskIndex, 1);
+            await this.saveTasks();
+            const taskElement = document.getElementById(taskId);
+            if (taskElement) {
+                taskElement.remove();
+                this.updateProgress();
+            }
+        }
+    }
+
+    updateProgress() {
+        const totalTasks = this.tasks.length;
+        const completedTasks = this.tasks.filter(task => task.status === 'done').length;
+        const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
+        this.progressBar.style.width = `${progress}%`;
+        this.progressText.textContent = `${progress}%`;
+
+        if (progress === 100 && totalTasks > 0) {
+            this.showCompletionMessage();
         }
     }
 }
