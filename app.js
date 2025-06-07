@@ -353,53 +353,47 @@ document.addEventListener('DOMContentLoaded', () => {
     new TodoApp();
 });
 
-// 完了メッセージの表示/非表示
+// クラッカーエフェクトの生成
+function createConfetti() {
+    const container = document.querySelector('.confetti-container');
+    const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+    
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        container.appendChild(confetti);
+    }
+}
+
+// 完了メッセージの表示
 function showCompletionMessage() {
     const message = document.getElementById('completion-message');
-    message.classList.add('show');
+    message.classList.remove('hidden');
+    createConfetti();
 }
 
+// 完了メッセージの非表示
 function hideCompletionMessage() {
     const message = document.getElementById('completion-message');
-    message.classList.remove('show');
+    message.classList.add('hidden');
+    const container = document.querySelector('.confetti-container');
+    container.innerHTML = '';
 }
 
-// ケバブメニューとモーダルの機能
-document.addEventListener('DOMContentLoaded', function() {
-    const kebabMenu = document.getElementById('kebab-menu');
-    const kebabDropdown = document.getElementById('kebab-dropdown');
-    const showManual = document.getElementById('show-manual');
-    const manualModal = document.getElementById('manual-modal');
-    const closeManual = document.getElementById('close-manual');
+// タスクの完了状態をチェック
+function checkAllTasksCompleted() {
+    const todoList = document.getElementById('todo-list');
+    const inProgressList = document.getElementById('in-progress-list');
+    
+    if (todoList.children.length === 0 && inProgressList.children.length === 0) {
+        showCompletionMessage();
+    }
+}
 
-    // ケバブメニューの表示/非表示
-    kebabMenu.addEventListener('click', function(e) {
-        e.stopPropagation();
-        kebabDropdown.classList.toggle('hidden');
-    });
-
-    // ドロップダウンメニュー以外をクリックしたら閉じる
-    document.addEventListener('click', function(e) {
-        if (!kebabDropdown.contains(e.target) && e.target !== kebabMenu) {
-            kebabDropdown.classList.add('hidden');
-        }
-    });
-
-    // 説明書モーダルを表示
-    showManual.addEventListener('click', function() {
-        manualModal.classList.remove('hidden');
-        kebabDropdown.classList.add('hidden');
-    });
-
-    // 説明書モーダルを閉じる
-    closeManual.addEventListener('click', function() {
-        manualModal.classList.add('hidden');
-    });
-
-    // モーダルの外側をクリックしたら閉じる
-    manualModal.addEventListener('click', function(e) {
-        if (e.target === manualModal) {
-            manualModal.classList.add('hidden');
-        }
-    });
-}); 
+// タスクの移動後に完了状態をチェック
+function onTaskMoved() {
+    checkAllTasksCompleted();
+} 
