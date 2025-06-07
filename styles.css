@@ -790,16 +790,17 @@ select {
     height: 10px;
     background-color: #f00;
     opacity: 0.8;
-    animation: confetti-fall 3s ease-in-out forwards;
+    transform-origin: center;
+    animation: confetti-explode 3s ease-out forwards;
 }
 
-@keyframes confetti-fall {
+@keyframes confetti-explode {
     0% {
-        transform: translateY(-100vh) rotate(0deg);
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
         opacity: 1;
     }
     100% {
-        transform: translateY(100vh) rotate(360deg);
+        transform: translate(-50%, -50%) scale(1) rotate(720deg);
         opacity: 0;
     }
 } 

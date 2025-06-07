@@ -353,15 +353,43 @@ document.addEventListener('DOMContentLoaded', () => {
     new TodoApp();
 });
 
+// ケバブメニューの機能
+document.addEventListener('DOMContentLoaded', function() {
+    const kebabMenu = document.getElementById('kebab-menu');
+    const kebabDropdown = document.getElementById('kebab-dropdown');
+
+    // ケバブメニューの表示/非表示
+    kebabMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+        kebabDropdown.classList.toggle('hidden');
+    });
+
+    // ドロップダウンメニュー以外をクリックしたら閉じる
+    document.addEventListener('click', function(e) {
+        if (!kebabDropdown.contains(e.target) && e.target !== kebabMenu) {
+            kebabDropdown.classList.add('hidden');
+        }
+    });
+});
+
 // クラッカーエフェクトの生成
 function createConfetti() {
     const container = document.querySelector('.confetti-container');
     const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
     
+    // 中央から放射状に広がるように配置
     for (let i = 0; i < 100; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + 'vw';
+        
+        // 中央からランダムな角度で発射
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 200 + 50; // 50pxから250pxの範囲
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+        
+        confetti.style.left = `calc(50% + ${x}px)`;
+        confetti.style.top = `calc(50% + ${y}px)`;
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         confetti.style.animationDelay = Math.random() * 3 + 's';
         container.appendChild(confetti);
@@ -387,8 +415,9 @@ function hideCompletionMessage() {
 function checkAllTasksCompleted() {
     const todoList = document.getElementById('todo-list');
     const inProgressList = document.getElementById('in-progress-list');
+    const doneList = document.getElementById('done-list');
     
-    if (todoList.children.length === 0 && inProgressList.children.length === 0) {
+    if (todoList.children.length === 0 && inProgressList.children.length === 0 && doneList.children.length > 0) {
         showCompletionMessage();
     }
 }
