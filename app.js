@@ -105,44 +105,40 @@ class TodoApp {
 
         // 各タスクリストに対してドラッグ＆ドロップイベントを設定
         taskLists.forEach(list => {
-            // ドラッグオーバー時の処理
-            list.addEventListener('dragover', e => {
+            list.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                e.target.classList.add('dragging');
+            });
+
+            list.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+            });
+
+            list.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                const draggingItem = document.querySelector('.dragging');
-                if (draggingItem) {
+                const draggingTask = document.querySelector('.dragging');
+                if (draggingTask) {
                     const afterElement = this.getDragAfterElement(list, e.clientY);
                     if (afterElement) {
-                        list.insertBefore(draggingItem, afterElement);
+                        list.insertBefore(draggingTask, afterElement);
                     } else {
-                        list.appendChild(draggingItem);
+                        list.appendChild(draggingTask);
                     }
                 }
             });
 
-            // ドロップ時の処理
-            list.addEventListener('drop', async e => {
+            list.addEventListener('drop', (e) => {
                 e.preventDefault();
-                const draggingItem = document.querySelector('.dragging');
-                if (draggingItem) {
-                    const taskId = draggingItem.dataset.id;
-                    const newStatus = list.closest('.task-group').dataset.status;
-                    
-                    // タスクのステータスを更新
-                    const task = this.tasks.find(t => t.id === taskId);
-                    if (task) {
-                        task.status = newStatus;
-                        await this.saveTasks();
-                        
-                        // タスクのラベルを更新
-                        const statusLabel = draggingItem.querySelector('.status-label');
-                        if (statusLabel) {
-                            statusLabel.textContent = this.translations[this.currentLang][`status.${newStatus}`];
-                            statusLabel.dataset.status = newStatus;
-                        }
-                        
-                        // タスクのクラスを更新
-                        draggingItem.className = `task-item status-${newStatus}`;
-                    }
+                const taskId = e.dataTransfer.getData('text/plain');
+                const task = document.getElementById(taskId);
+                const newStatus = list.parentElement.dataset.status;
+                
+                // タスクのステータスを更新
+                const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+                if (taskIndex !== -1) {
+                    this.tasks[taskIndex].status = newStatus;
+                    this.saveTasks();
+                    this.onTaskMoved(); // タスク移動後に完了チェックを実行
                 }
             });
         });
@@ -360,6 +356,7 @@ class TodoApp {
         // 未着手または進行中にタスクがある場合、フラグを立てる
         if (todoList.children.length > 0 || inProgressList.children.length > 0) {
             this.hasTasksInProgress = true;
+            console.log('Tasks in progress detected');
         }
         
         // 未着手と進行中のタスクがなく、完了タスクが1つ以上あり、
@@ -368,6 +365,7 @@ class TodoApp {
             todoList.children.length === 0 && 
             inProgressList.children.length === 0 && 
             doneList.children.length > 0) {
+            console.log('All tasks completed, showing confetti');
             this.showCompletionMessage();
             this.hasTasksInProgress = false; // フラグをリセット
         }
@@ -375,16 +373,19 @@ class TodoApp {
 
     // タスクの移動後に完了状態をチェック
     onTaskMoved() {
+        console.log('Task moved, checking completion status');
         setTimeout(() => this.checkAllTasksCompleted(), 100);
     }
 
     // タスクの追加時にフラグをリセット
     onTaskAdded() {
         this.hasTasksInProgress = false;
+        console.log('New task added, resetting progress flag');
     }
 
     // 完了メッセージの表示
     showCompletionMessage() {
+        console.log('Showing completion message and confetti');
         const message = document.getElementById('completion-message');
         message.classList.remove('hidden');
         this.createConfetti();
