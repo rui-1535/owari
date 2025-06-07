@@ -391,7 +391,7 @@ function createConfetti() {
         confetti.style.left = `calc(50% + ${x}px)`;
         confetti.style.top = `calc(50% + ${y}px)`;
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.animationDelay = Math.random() * 2 + 's'; // 2秒以内にランダムな遅延
         container.appendChild(confetti);
     }
 }
@@ -401,6 +401,11 @@ function showCompletionMessage() {
     const message = document.getElementById('completion-message');
     message.classList.remove('hidden');
     createConfetti();
+    
+    // 2秒後にメッセージを非表示
+    setTimeout(() => {
+        hideCompletionMessage();
+    }, 2000);
 }
 
 // 完了メッセージの非表示
@@ -417,12 +422,15 @@ function checkAllTasksCompleted() {
     const inProgressList = document.getElementById('in-progress-list');
     const doneList = document.getElementById('done-list');
     
-    if (todoList.children.length === 0 && inProgressList.children.length === 0 && doneList.children.length > 0) {
+    // 未着手と進行中のタスクがなく、完了タスクが1つ以上ある場合
+    if (todoList.children.length === 0 && 
+        inProgressList.children.length === 0 && 
+        doneList.children.length > 0) {
         showCompletionMessage();
     }
 }
 
 // タスクの移動後に完了状態をチェック
 function onTaskMoved() {
-    checkAllTasksCompleted();
+    setTimeout(checkAllTasksCompleted, 100); // 少し遅延を入れて確実にチェック
 } 
